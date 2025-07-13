@@ -57,6 +57,7 @@ node *calculateOutMismatch(node *left, node *top) {
 float avg_segments_count = 0;
 
 int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > &b) {
+    avg_segments_count = 0;
     node *ED_left[2][b.size() + 1];
     node *ED_top[2][b.size() + 1];
     int sum = 0;
