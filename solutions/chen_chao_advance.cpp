@@ -1,7 +1,7 @@
 #ifndef CHEN_CHA0_ADVANCE_C
 #define CHEN_CHA0_ADVANCE_C
 #include <bits/stdc++.h>
-#include "geometricView.cpp"
+#include "../structures/GeometricView.cpp"
 
 using namespace std;
 

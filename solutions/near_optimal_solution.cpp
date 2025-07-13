@@ -2,7 +2,7 @@
 #define NEAR_OPTIMAL_SOLUTION
 
 #include <bits/stdc++.h>
-#include "binaryTreeRepresentation.cpp"
+#include "../structures/BST/BstView.cpp"
 
 using namespace std;
 

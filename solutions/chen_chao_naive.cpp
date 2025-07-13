@@ -2,9 +2,9 @@
 #define CHEN_CHAO_NAIVE_C
 /// O (N * m + M * n) solution for the edit distance problem
 #include <bits/stdc++.h>
-#include "common_utils.cpp"
-#include "gridTable.cpp"
-#include "minQueue.cpp"
+#include "../common/utils.cpp"
+#include "../structures/GridTable.cpp"
+#include "../structures/MinQueue.cpp"
 
 using namespace std;
 
@@ -65,7 +65,7 @@ int chen_chao_naive_solution(vector<pair<char, int> > &a, vector<pair<char, int>
     const string a_decompressed = decompress_string(a);
     const string b_decompressed = decompress_string(b);
 
-    gridTable ED(a, a_decompressed.size(), b, b_decompressed.size());
+    GridTable ED(a, a_decompressed.size(), b, b_decompressed.size());
     for (int i = 0; i <= a_decompressed.size(); i++) {
         ED.set(i, 0, i);
     }

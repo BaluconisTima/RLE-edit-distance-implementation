@@ -3,11 +3,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct gridTable {
+struct GridTable {
     vector<int> rows, cols;
     vector<vector<int> > data;
 
-    gridTable(const vector<pair<char, int> > &a_compressed, const int n, const vector<pair<char, int> > &b_compressed,
+    GridTable(const vector<pair<char, int> > &a_compressed, const int n, const vector<pair<char, int> > &b_compressed,
               const int m) {
         rows = vector(n + 1, -1);
         cols = vector(m + 1, -1);

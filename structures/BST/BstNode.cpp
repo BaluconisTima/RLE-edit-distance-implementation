@@ -2,7 +2,7 @@
 #define BST_NODE
 using namespace std;
 #include <string>
-#include "common_utils.cpp"
+#include "../../common/utils.cpp"
 
 vector<vector<pair<float, float> > > shifts = {
     {{10000000000.0, 10000000000.0}, {0, 0}, {20000000000.0, 20000000000.0}},

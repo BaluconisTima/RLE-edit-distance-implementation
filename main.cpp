@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
-#include "chen_chao_naive.cpp"
-#include "chen_chao_advance.cpp"
-#include "naive_dp.cpp"
+#include "solutions/chen_chao_naive.cpp"
+#include "solutions/chen_chao_advance.cpp"
+#include "solutions/naive_dp.cpp"
 //#include "GeometricView.cpp"
-#include "near_optimal_solution.cpp"
-#include "common_utils.cpp"
+#include "solutions/near_optimal_solution.cpp"
+#include "common/utils.cpp"
 using namespace std;
 
 GeometricView generate_point_test(int size_t, int block_limit) {

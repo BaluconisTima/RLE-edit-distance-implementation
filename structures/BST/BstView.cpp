@@ -7,7 +7,7 @@
 #define endl '\n'
 using namespace std;
 #include "BstNode.cpp"
-#include "common_utils.cpp"
+#include "../../common/utils.cpp"
 
 namespace treap {
     void print_tree(node *v) {

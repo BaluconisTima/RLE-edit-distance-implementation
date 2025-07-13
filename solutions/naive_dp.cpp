@@ -2,7 +2,7 @@
 #define NAIVE_DP
 // O(N * M) solution for the edit distance problem
 #include <bits/stdc++.h>
-#include "common_utils.cpp"
+#include "../common/utils.cpp"
 
 using namespace std;
 

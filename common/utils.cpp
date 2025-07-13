@@ -2,7 +2,7 @@
 #define UTILS_COMMON
 
 #include <bits/stdc++.h>
-#include "GeometricView.cpp"
+#include "../structures/GeometricView.cpp"
 using namespace std;
 
 vector<pair<char, int> > compress_string(string &original_string) {
