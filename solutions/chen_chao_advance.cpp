@@ -46,7 +46,10 @@ GeometricView calculateOutMismatch(GeometricView left, GeometricView top) {
     return out;
 }
 
+float avg_segments_count_chen_chao = 0;
+
 int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, int> > &b) {
+    avg_segments_count_chen_chao = 0;
     GeometricView ED_left[2][b.size() + 1], ED_top[2][b.size() + 1];
     int sum = 0;
     for (int j = 0; j < b.size(); j++) {
@@ -81,6 +84,8 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
                 // Mismatch block
                 out = calculateOutMismatch(left, top);
             }
+            avg_segments_count_chen_chao += out.points.size();
+
             auto out_split = splitIncluding(out, b[j].second);
             ED_top[(i + 1)%2][j] = out_split.first;
             out_split.second.moveX(-out_split.second.points[0].first);
@@ -93,6 +98,7 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
             top.points.clear();
         }
     }
+    avg_segments_count_chen_chao /= (a.size() * b.size());
 
     return ED_top[a.size()%2][b.size() - 1].points.back().second;
 }

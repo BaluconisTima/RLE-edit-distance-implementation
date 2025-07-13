@@ -11,8 +11,9 @@ int main() {
     cout.tie(0);
     ios_base::sync_with_stdio(0);
     srand(time(0));
+    generate_hard_test2(100, 10, 1000);
 
-    generate_hard_test(100, 100, 10, 1000);
+    //generate_hard_test(100, 1000, 10, 1000);
     // int n_limit = 10000, m_limit = 1000, block_limit = 10000;
     // // while (true) {
     // //     auto a = compressed_string_generator(n_limit, block_limit, 0, 10),

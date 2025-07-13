@@ -2,22 +2,23 @@
 #include <vector>
 #include <utility>
 #include "../solutions/near_optimal.cpp"
+#include "../solutions/chen_chao_advance.cpp"
 using namespace std;
-
 
 void generate_hard_test(int n, int check_count, int blocks_per_add, int block_size) {
     vector<pair<char, int>> a, b;
+    float ans1 = 0;
     for (int i = 0; i < n; i++) {
         vector<pair<char, int>> a1, b1;
         float ans = 0;
-        for (int j = 0; j < check_count; j++) {
+        while (ans1 + 0.1 >= ans) {
             for (int q = 0; q < blocks_per_add; q++) {
-                a.push_back({rand() % 100 + 1, rand() % block_size + 1});
-                b.push_back({rand() % 100 + 1, rand() % block_size + 1});
+                a.push_back({rand() % 26 + 1, rand() % block_size + 1});
+                b.push_back({rand() % 26 + 1, rand() % block_size + 1});
             }
-            near_optimal_solution(a, b);
-            if (ans < avg_segments_count) {
-                ans = avg_segments_count;
+            chen_chao_advance_solution(a, b);
+            if (ans < avg_segments_count_chen_chao) {
+                ans = avg_segments_count_chen_chao;
                 a1 = a;
                 b1 = b;
             }
@@ -26,6 +27,7 @@ void generate_hard_test(int n, int check_count, int blocks_per_add, int block_si
                 b.pop_back();
             }
         }
+        ans1 = ans;
         cerr << a.size() << ' ' << ans << endl;
 
 
@@ -45,6 +47,43 @@ vector<pair<char, int> > compressed_string_generator(int block_number_limit, int
     }
     return compressed_string;
 }
+double rnd() {
+     int r = rand() % 10000;
+    return (double) r / (double) 10000;
+}
+
+void generate_hard_test2(int n, int blocks_change_base, int sizes_cap) {
+    auto a = compressed_string_generator(n, sizes_cap, 0, 5),
+         b = compressed_string_generator(10, sizes_cap, 0, 5);
+    float temp = 1;
+    float last_ans = 0;
+    while (last_ans < 15) {
+        temp *= 0.99;
+        int changes = blocks_change_base * temp;
+        changes = rand() % (changes + 1) + 1;
+        auto a1 = a, b1 = b;
+        while (changes--) {
+            if (rand() % 2 == 0) {
+                int index = rand() % a1.size();
+                a1[index].first = 'a' + rand() % 5;
+                a1[index].second = 1000 + rand() % sizes_cap + 1;
+            } else {
+                int index = rand() % b1.size();
+                b1[index].first = 'a' + rand() % 5;
+                b1[index].second = rand() % sizes_cap + 1;
+            }
+        }
+        int ans = chen_chao_advance_solution(a1, b1);
+        float new_ans = avg_segments_count_chen_chao;
+        if (new_ans > last_ans || rnd() < exp((new_ans - last_ans) / temp)) {
+            cerr << new_ans << endl;
+            last_ans = new_ans;
+            a = a1;
+            b = b1;
+        }
+    }
+}
+
 
 
 vector<pair<char, int> > compressed_string_generator(int block_number_limit, int block_size_limit, int char_limit) {
