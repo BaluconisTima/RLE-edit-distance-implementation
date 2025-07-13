@@ -13,5 +13,5 @@ add_executable(praca_roczna solutions/naive_dp.cpp
         structures/GeometricView.cpp
         "structures/BST/BSTView.cpp"
         structures/BST/BstNode.cpp
-        solutions/near_optimal_solution.cpp
+        solutions/near_optimal.cpp
 )

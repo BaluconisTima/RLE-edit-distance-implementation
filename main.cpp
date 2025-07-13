@@ -3,7 +3,7 @@
 #include "solutions/chen_chao_advance.cpp"
 #include "solutions/naive_dp.cpp"
 //#include "GeometricView.cpp"
-#include "solutions/near_optimal_solution.cpp"
+#include "solutions/near_optimal.cpp"
 #include "common/utils.cpp"
 using namespace std;
 
