@@ -54,24 +54,24 @@ node *calculateOutMismatch(node *left, node *top) {
     }
 }
 
+float avg_segments_count = 0;
+
 int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > &b) {
-    node *ED_left[a.size() + 1][b.size() + 1];
-    node *ED_top[a.size() + 1][b.size() + 1];
+    node *ED_left[2][b.size() + 1];
+    node *ED_top[2][b.size() + 1];
     int sum = 0;
     for (int j = 0; j < b.size(); j++) {
         ED_top[0][j] = new node(0, b[j].second, sum, sum + b[j].second);
         sum += b[j].second;
     }
     sum = 0;
-    for (int i = 0; i < a.size(); i++) {
-        ED_left[i][0] = new node(0, a[i].second, sum + a[i].second, sum);
-        sum += a[i].second;
-    }
 
     for (int i = 0; i < a.size(); i++) {
+        ED_left[i%2][0] = new node(0, a[i].second, sum + a[i].second, sum);
+        sum += a[i].second;
         for (int j = 0; j < b.size(); j++) {
-            auto left = ED_left[i][j];
-            auto top = ED_top[i][j];
+            auto left = ED_left[i%2][j];
+            auto top = ED_top[i%2][j];
             node *out;
             if (a[i].first == b[j].first) {
                 // Match block;
@@ -81,15 +81,18 @@ int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > 
                 // Mismatch block
                 out = calculateOutMismatch(left, top);
             }
+            out->pull();
+            avg_segments_count += out->sz;
             auto out_split = smart_split(out, b[j].second);
             out_split.second->add_delta_root(-out_split.second->get_leftmost()->get_xl(), 0);
 
-            ED_top[i + 1][j] = out_split.first;
-            ED_left[i][j + 1] = out_split.second;
+            ED_top[(i + 1)%2][j] = out_split.first;
+            ED_left[i%2][j + 1] = out_split.second;
         }
     }
+    avg_segments_count = avg_segments_count / (b.size()) / (a.size());
 
-    return ED_top[a.size()][b.size() - 1]->get_rightmost()->get_yr();
+    return ED_top[a.size()%2][b.size() - 1]->get_rightmost()->get_yr();
 }
 
 #endif // NEAR_OPTIMAL_SOLUTION

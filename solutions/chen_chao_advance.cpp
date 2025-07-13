@@ -47,7 +47,7 @@ GeometricView calculateOutMismatch(GeometricView left, GeometricView top) {
 }
 
 int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, int> > &b) {
-    GeometricView ED_left[a.size() + 1][b.size() + 1], ED_top[a.size() + 1][b.size() + 1];
+    GeometricView ED_left[2][b.size() + 1], ED_top[2][b.size() + 1];
     int sum = 0;
     for (int j = 0; j < b.size(); j++) {
         ED_top[0][j] = GeometricView();
@@ -57,15 +57,18 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
     }
     sum = 0;
     for (int i = 0; i < a.size(); i++) {
-        ED_left[i][0] = GeometricView();
-        ED_left[i][0].push_back({0, sum});
-        sum += a[i].second;
-        ED_left[i][0].push_back({a[i].second, sum});
+
     }
 
     for (int i = 0; i < a.size(); i++) {
+
+        ED_left[i%2][0] = GeometricView();
+        ED_left[i%2][0].push_back({0, sum});
+        sum += a[i].second;
+        ED_left[i%2][0].push_back({a[i].second, sum});
+
         for (int j = 0; j < b.size(); j++) {
-            GeometricView left = ED_left[i][j], top = ED_top[i][j], out;
+            GeometricView left = ED_left[i%2][j], top = ED_top[i%2][j], out;
             reverse(left);
             if (a[i].first == b[j].first) {
                 // Match block
@@ -79,13 +82,18 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
                 out = calculateOutMismatch(left, top);
             }
             auto out_split = splitIncluding(out, b[j].second);
-            ED_top[i + 1][j] = out_split.first;
+            ED_top[(i + 1)%2][j] = out_split.first;
             out_split.second.moveX(-out_split.second.points[0].first);
-            ED_left[i][j + 1] = out_split.second;
-            reverse(ED_left[i][j + 1]);
+            ED_left[i%2][j + 1] = out_split.second;
+            reverse(ED_left[i%2][j + 1]);
+
+            ED_left[i%2][j].points.clear();
+            ED_top[i%2][j].points.clear();
+            left.points.clear();
+            top.points.clear();
         }
     }
 
-    return ED_top[a.size()][b.size() - 1].points.back().second;
+    return ED_top[a.size()%2][b.size() - 1].points.back().second;
 }
 #endif

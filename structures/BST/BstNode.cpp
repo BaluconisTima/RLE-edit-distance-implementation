@@ -2,6 +2,7 @@
 #define BST_NODE
 using namespace std;
 #include <string>
+#include <random>
 #include "../../common/utils.cpp"
 
 vector<vector<pair<float, float> > > shifts = {
@@ -108,6 +109,7 @@ public:
     float d_gradient = 0;
     bool forDelete = false;
     int updated_time_hash = 0;
+    int sz = 1;
 
 private:
     float xl, xr, yl, yr;
@@ -122,6 +124,7 @@ public:
         xr = _xr;
         yl = _yl;
         yr = _yr;
+        sz = 1;
         our_type = line_type(_xl, _xr, _yl, _yr);
         deltax = 0;
         deltay = 0;
@@ -178,7 +181,7 @@ public:
         return min(tmin, our_time()) - dt;
     }
 
-    node *get_leftmost() {
+    node *get_leftmost(int d = 0) {
         auto v = this;
         if (v == nullptr) {
             return nullptr;
@@ -186,7 +189,7 @@ public:
         v->push();
         auto cur = v;
         if (v->l != nullptr) {
-            cur = v->l->get_leftmost();
+            cur = v->l->get_leftmost(d + 1);
         }
         v->pull();
         return cur;
@@ -369,14 +372,17 @@ public:
     }
 
     void pull() {
+        sz = 1;
         tmin = INT_MAX;
         if (l != nullptr) {
             l->p = this;
             tmin = min(tmin, l->get_tmin());
+            sz += l->sz;
         }
         if (r != nullptr) {
             r->p = this;
             tmin = min(tmin, r->get_tmin());
+            sz += r->sz;
         }
     }
 };
