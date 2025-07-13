@@ -155,17 +155,9 @@ public:
     }
 
     pair<float, float> get_extra_shift_left() {
-        //cerr << "type_l: " << type_l << endl;
-        //cerr << "our_time: " << our_time() << endl;
-        //int our_type = line_type(xl, yl, xr, yr);
         if (type_l < -5 || type_l > 5) {
             return {0, 0};
         }
-        // if (shifts[type_l + 1][our_type + 1].first > 100) {
-        //     cerr << "Error: shift is too big: " << shifts[type_l + 1][our_type + 1].first << endl;
-        //     cerr << "type_l: " << type_l << ", our_type: " << our_type << endl;
-        //     exit(1);
-        // }
         return {
             shifts[type_l + 1][our_type + 1].first * dt,
             shifts[type_l + 1][our_type + 1].second * dt
@@ -176,11 +168,6 @@ public:
         if (type_r < -5 || type_r > 5) {
             return {dt, 0};
         }
-        // if (shifts[our_type + 1][type_r + 1].first > 100) {
-        //     cerr << "Error: shift is too big: " << shifts[our_type + 1][type_r + 1].first << endl;
-        //     cerr << "type_r: " << type_r << ", our_type: " << our_type << endl;
-        //     exit(1);
-        // }
         return {
             shifts[our_type + 1][type_r + 1].first * dt,
             shifts[our_type + 1][type_r + 1].second * dt
@@ -244,7 +231,6 @@ public:
 
 private:
     void add_t(int t) {
-        //cerr << "add_t: " << t << ' ' << this << endl;
         if (d_gradient == 0) {
             dt += t;
         } else {
@@ -260,7 +246,6 @@ private:
     }
 
     void move_gradient(float d) {
-        //cerr << "move_gradient: " << d << endl;
         if (abs(d) < 0.00001) {
             return;
         }
@@ -333,7 +318,6 @@ public:
         return yr + deltay + d_gradient * (xr + shift.first) + shift.second;
     }
 
-    // push everything else:
     void push_stuff() {
         add_t(p->dt);
         move_gradient(p->d_gradient);
@@ -350,8 +334,6 @@ public:
         }
         pair<float, float> shift_left = get_extra_shift_left();
         pair<float, float> shift_right = get_extra_shift_right();
-        //cerr << "push_t: " << dt << ' ' << shift_left.first << ' ' << shift_right.first << endl;
-        //cerr << "push_t: " << dt << ' ' << shift_left.second << ' ' << shift_right.second << endl;
         xl += shift_left.first;
         xr += shift_right.first;
         yl += shift_left.second;
@@ -360,16 +342,12 @@ public:
     }
 
     void push() {
-        //cerr << "push started";
         if (l != nullptr) {
-            //cerr << " left";
             l->push_stuff();
         }
         if (r != nullptr) {
-            //cerr << " right";
             r->push_stuff();
         }
-        //cerr << "AAAA\n";
         yl = get_yl();
         yr = get_yr();
         xl = get_xl();
@@ -391,35 +369,16 @@ public:
     }
 
     void pull() {
-        //cerr << "pull started" << endl;
-        //cerr << "left" << endl;
-        // now init from self:
         tmin = INT_MAX;
         if (l != nullptr) {
             l->p = this;
-            // now pull from l:
             tmin = min(tmin, l->get_tmin());
         }
-        //cerr << "right" << endl;
         if (r != nullptr) {
             r->p = this;
-            // now pull from r:
             tmin = min(tmin, r->get_tmin());
         }
-        //cerr << "pull done" << endl;
     }
 };
-
-void debug_node(node *v, string pref = "") {
-#ifdef LOCAL
-    if (v != nullptr) {
-        debug_node(v->r, pref + " ");
-        cerr << pref << "-" << " " << v->id << '\n';
-        debug_node(v->l, pref + " ");
-    } else {
-        cerr << pref << "-" << " " << "nullptr" << '\n';
-    }
-#endif
-}
 
 #endif // BST_NODE`

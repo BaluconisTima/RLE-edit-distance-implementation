@@ -17,20 +17,17 @@ GeometricView calculateOutMismatch(GeometricView left, GeometricView top) {
 
     int h = left.points.back().first + 1,
             w = top.points.back().first + 1;
-    //cerr << h << ' ' << w << endl;
     GeometricView left_h = CSWM_Slide(left, h),
             top_h = CSWM_Slide(top, h);
 
     GeometricView left_2, top_2;
     auto split_l = splitIncluding(left_h, h - 1);
-    //cerr << "left_h " << left_h.points.back().first << endl;
     for (auto to: split_l.first.points) {
         left_2.push_back({to.first, to.second + to.first});
     }
     for (auto to: split_l.second.points) {
         left_2.push_back({to.first + w - h, to.second + w - 1});
     }
-    //cerr << "top_h " << top_h.points.back().first << endl;
     auto split_t = splitIncluding(top_h, w - 1);
     for (auto to: split_t.first.points) {
         top_2.push_back({to.first, to.second + h - 1});

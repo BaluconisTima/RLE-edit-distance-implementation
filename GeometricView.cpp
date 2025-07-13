@@ -90,14 +90,6 @@ GeometricView min(GeometricView a, GeometricView b) {
     if (b.points.empty()) {
         return a;
     }
-    // cerr << "A "  << endl;
-    // for (auto to: a.points) {
-    //     cerr << to.first << " " << to.second << endl;
-    // }
-    // cerr << "B "  << endl;
-    // for (auto to: b.points) {
-    //     cerr << to.first << " " << to.second << endl;
-    // }
     if (a.points[0].first != b.points[0].first) {
         cerr << "Error finding min: GeometricView min: points do not start at the same x-coordinate." << endl;
         exit(1);
@@ -155,7 +147,6 @@ GeometricView CSWM_Slide(GeometricView input, int h) {
     if (h == 1) {
         return input;
     }
-    // cerr << "-------------------" << endl;
 
     GeometricView result;
     pair<int, int> last_point = input.points.front();
@@ -184,21 +175,15 @@ GeometricView CSWM_Slide(GeometricView input, int h) {
                 current_point = {next_point.first, in_point_value(previous_point, current_point, next_point.first)};
             }
             if (current_point.second >= in_point_value(last_point, next_point, current_point.first)) {
-                // cerr << "previous_point: " << previous_point.first << " " << previous_point.second << endl;
-                // cerr << "current_point: " << current_point.first << " " << current_point.second << endl;
-                // cerr << "next_point: " << next_point.first << " " << next_point.second << endl;
-                // cerr << "last_point: " << last_point.first << " " << last_point.second << endl;
                 auto interPoint = lines_intersection_by_points(previous_point, current_point, last_point, next_point);
                 if (interPoint != pair<int, int>{INT_MAX, INT_MAX}) {
                     if (interPoint.first > result.points.back().first) {
-                        // cerr << "interPoint1: " << interPoint.first << " " << interPoint.second << endl;
                         result.push_back(interPoint);
                     }
                     interPoint.first++;
                     if (interPoint.first < next_point.first && interPoint.first <= current_point.first) {
                         interPoint.second = min(in_point_value(previous_point, current_point, interPoint.first),
                                                 in_point_value(last_point, next_point, interPoint.first));
-                        // cerr << "interPoint2: " << interPoint.first << " " << interPoint.second << endl;
                         result.push_back(interPoint);
                     }
                 }
@@ -210,15 +195,9 @@ GeometricView CSWM_Slide(GeometricView input, int h) {
                 line_above = false;
                 break;
             } else if (j + 1 == listL.points.size()) {
-                //cerr << "current_point " << current_point.first << " " << current_point.second << endl;
                 result.push_back(current_point);
             }
         }
-        // cerr << "line above: " << line_above << endl;
-        // cerr << "Result: ";
-        // for (auto to: result.points) {
-        //     cerr << to.first << " " << to.second << endl;
-        // }
 
         if (line_above) {
             while (listL.points.size() > 1) {
@@ -231,11 +210,6 @@ GeometricView CSWM_Slide(GeometricView input, int h) {
                     auto q = lines_intersection_by_points(listL.points[listL.points.size() - 2],
                                                           listL.points[listL.points.size() - 1], next_point,
                                                           {next_point.first - 1, next_point.second});
-                    // cerr << "point a: " << listL.points[listL.points.size() - 2].first << " " << listL.points[listL.points.size() - 2].second << endl;
-                    // cerr << "point b: " << listL.points[listL.points.size() - 1].first << " " << listL.points[listL.points.size() - 1].second << endl;
-                    // cerr << "point c: " << next_point.first << " " << next_point.second << endl;
-                    // cerr << "point d: " << next_point.first - 1 << " " << next_point.second << endl;
-                    // cerr << "q2 " << q.first << " " << q.second << endl;
                     listL.points.pop_back();
                     listL.points.push_back(q);
                     break;
@@ -253,25 +227,16 @@ GeometricView CSWM_Slide(GeometricView input, int h) {
                                                           {next_point.first - h + 1, 10}, {
                                                               next_point.first - h + 1, 0
                                                           });
-                    // cerr << "q " << q.first << " " << q.second << endl;
                     listL.points.pop_front();
-                    // cerr << "listL: " << listL.points[0].first << " " << listL.points[0].second << endl;
                     listL.points.push_front(q);
                 }
             }
         }
-        // cerr << "listL: " << endl;
-        // for (auto to: listL.points) {
-        //     cerr << to.first << " " << to.second << endl;
-        // }
-
         last_point = next_point;
     }
-    //cerr << "--------------------------" << endl;
 
     for (auto to: listL.points) {
         if (to.first + h - 1 > last_point.first && to.first + h - 1 <= last_point.first + h - 1) {
-            //cerr << "to: " << to.first + h - 1 << " " << to.second << endl;
             result.push_back({to.first + h - 1, to.second});
         }
     }
