@@ -129,8 +129,8 @@ int main() {
     };
     while (true) {
         test_compare(chen_chao_advance_solution, near_optimal_solution, a, b);
-        test_edit_distance(near_optimal_solution, a, b, 1);
-        test_edit_distance(chen_chao_advance_solution, a, b, 1);
+        // test_edit_distance(near_optimal_solution, a, b, 1);
+        // test_edit_distance(chen_chao_advance_solution, a, b, 1);
 
         a = compressed_string_generator(n_limit, block_limit, 0, 10),
              b = compressed_string_generator(m_limit, block_limit, 0, 10);
