@@ -57,10 +57,7 @@ public:
             nxt = v->next();
         }
         if (nxt != nullptr && nxt != v && !nxt->forDelete) {
-            nxt->updateOurType();
-            nxt->type_l = our_type;
-            v->type_r = nxt->our_type;
-            //nxt->update_up();
+            v->type_r = nxt->getOurType();
         } else {
             v->type_r = INT_MAX;
         }
@@ -74,20 +71,18 @@ public:
             prv = v->prev();
         }
         if (prv != nullptr && prv != v && !prv->forDelete) {
-            prv->updateOurType();
-            prv->type_r = our_type;
-            v->type_l = prv->our_type;
-            //prv->update_up();
+            v->type_l = prv->getOurType();
         } else {
             v->type_l = INT_MAX;
         }
         v->pull();
     }
 
-    void updateOurType() {
+    int getOurType() {
         push_t();
-        our_type = line_type(get_xl(), get_yl(), get_xr(), get_yr());
+        int our_type = line_type(get_xl(), get_yl(), get_xr(), get_yr());
         pull();
+        return our_type;
     }
 
     void update_types() {
@@ -95,13 +90,11 @@ public:
         if (forDelete) {
             return;
         }
-        int our_type_old = our_type;
-        updateOurType();
-        // if (our_type_old == our_type) {
-        //     return;
-        // }
         update_left();
         update_right();
+        update_our_time();
+        update_extra_shift_left();
+        update_extra_shift_right();
         update_up();
     }
 
@@ -111,12 +104,12 @@ public:
     // declare extra variables:
     int P;
     int type_l, type_r, dt;
-    int our_type = INT_MAX;
     float deltax, deltay;
     float d_gradient = 0;
     bool forDelete = false;
     int updated_time_hash = 0;
     int sz = 1;
+    int our_time_cur = INT_MAX;
 
 private:
     float xl, xr, yl, yr;
@@ -132,7 +125,6 @@ public:
         yl = _yl;
         yr = _yr;
         sz = 1;
-        our_type = line_type(_xl, _xr, _yl, _yr);
         deltax = 0;
         deltay = 0;
         tmin = INT_MAX;
@@ -154,37 +146,43 @@ public:
                + abs(get_yl_without_shift() - get_yr_without_shift());
     }
 
-    int our_time() {
-        if ((type_l == 1 && our_type == -1 && type_r == 0) ||
-            (type_l == 1 && our_type == 0 && type_r == -1) ||
-            (type_l == 0 && our_type == 1 && type_r == -1)) {
-            return dist();
+    void update_our_time() {
+        if ((type_l == 1 && getOurType() == -1 && type_r == 0) ||
+            (type_l == 1 && getOurType() == 0 && type_r == -1) ||
+            (type_l == 0 && getOurType() == 1 && type_r == -1)) {
+            our_time_cur = dist();
+            return;
         }
-        return INT_MAX;
+        our_time_cur = INT_MAX;
     }
 
-    pair<float, float> get_extra_shift_left() {
+    pair<float, float> extra_shift_left = {0, 0},
+            extra_shift_right = {0, 0};
+
+    void update_extra_shift_left() {
         if (type_l < -5 || type_l > 5) {
-            return {0, 0};
+           extra_shift_left = {0, 0};
+            return;
         }
-        return {
-            shifts[type_l + 1][our_type + 1].first * dt,
-            shifts[type_l + 1][our_type + 1].second * dt
+        extra_shift_left = {
+            shifts[type_l + 1][getOurType() + 1].first,
+            shifts[type_l + 1][getOurType() + 1].second
         };
     }
 
-    pair<float, float> get_extra_shift_right() {
+    void update_extra_shift_right() {
         if (type_r < -5 || type_r > 5) {
-            return {dt, 0};
+            extra_shift_right = {1, 0};
+            return;
         }
-        return {
-            shifts[our_type + 1][type_r + 1].first * dt,
-            shifts[our_type + 1][type_r + 1].second * dt
+        extra_shift_right = {
+            shifts[getOurType() + 1][type_r + 1].first,
+            shifts[getOurType() + 1][type_r + 1].second
         };
     }
 
     int get_tmin() {
-        return min(tmin, our_time()) - dt;
+        return min(tmin, our_time_cur) - dt;
     }
 
     node *get_leftmost(int d = 0) {
@@ -224,6 +222,7 @@ public:
     }
 
     void update_boarders() {
+        update_types();
         auto lm = get_leftmost(),
                 rm = get_rightmost();
         lm->push();
@@ -249,9 +248,6 @@ private:
     }
 
     void move_gradient(float d) {
-        if (abs(d) < 0.00001) {
-            return;
-        }
         deltay += d * deltax;
         d_gradient += d;
     }
@@ -304,21 +300,21 @@ public:
     }
 
     float get_xl() {
-        return xl + deltax + get_extra_shift_left().first;
+        return xl + deltax + extra_shift_left.first * dt;
     }
 
     float get_xr() {
-        return xr + deltax + get_extra_shift_right().first;
+        return xr + deltax + extra_shift_right.first * dt;
     }
 
     float get_yl() {
-        auto shift = get_extra_shift_left();
-        return yl + deltay + d_gradient * (xl + shift.first) + shift.second;
+        auto shift = extra_shift_left;
+        return yl + deltay + d_gradient * (xl + shift.first * dt) + shift.second * dt;
     }
 
     float get_yr() {
-        auto shift = get_extra_shift_right();
-        return yr + deltay + d_gradient * (xr + shift.first) + shift.second;
+        auto shift = extra_shift_right;
+        return yr + deltay + d_gradient * (xr + shift.first * dt) + shift.second * dt;
     }
 
     void push_stuff() {
@@ -335,12 +331,12 @@ public:
         if (r != nullptr) {
             r->add_t(dt);
         }
-        pair<float, float> shift_left = get_extra_shift_left();
-        pair<float, float> shift_right = get_extra_shift_right();
-        xl += shift_left.first;
-        xr += shift_right.first;
-        yl += shift_left.second;
-        yr += shift_right.second;
+        pair<float, float> shift_left = extra_shift_left;
+        pair<float, float> shift_right = extra_shift_right;
+        xl += shift_left.first * dt;
+        xr += shift_right.first * dt;
+        yl += shift_left.second * dt;
+        yr += shift_right.second * dt;
         dt = 0;
     }
 
@@ -363,10 +359,10 @@ public:
         d_gradient = 0;
         if (need_update_types) {
             if (l != nullptr) {
-                //l->update_types();
+                l->update_types();
             }
             if (r != nullptr) {
-                //r->update_types();
+                r->update_types();
             }
         }
         pull();
