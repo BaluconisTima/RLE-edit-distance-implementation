@@ -15,6 +15,7 @@ int types_updated_counter = 0;
 
 class node {
 public:
+
     node *next() {
         auto v = this;
         if (v->r == nullptr) {
@@ -27,6 +28,21 @@ public:
         v = v->r;
         while (v->l != nullptr) {
             v->push();
+            v = v->l;
+        }
+        return v;
+    }
+
+    node *non_push_next() {
+        auto v = this;
+        if (v->r == nullptr) {
+            while (v->p != nullptr && v->p->r == v) {
+                v = v->p;
+            }
+            return v->p;
+        }
+        v = v->r;
+        while (v->l != nullptr) {
             v = v->l;
         }
         return v;
@@ -49,18 +65,32 @@ public:
         return v;
     }
 
+    node *non_push_prev() {
+        auto v = this;
+        if (v->l == nullptr) {
+            while (v->p != nullptr && v->p->l == v) {
+                v = v->p;
+            }
+            return v->p;
+        }
+        v = v->l;
+        while (v->r != nullptr) {
+            v = v->r;
+        }
+        return v;
+    }
+
 
     void update_right(node *nxt = nullptr) {
         auto v = this;
         v->push();
         if (nxt == nullptr) {
-            nxt = v->next();
+            nxt = v->non_push_next();
         }
         if (nxt != nullptr && nxt != v && !nxt->forDelete) {
             nxt->updateOurType();
             nxt->type_l = our_type;
             v->type_r = nxt->our_type;
-            nxt->update_up();
         } else {
             v->type_r = INT_MAX;
         }
@@ -71,13 +101,12 @@ public:
         auto v = this;
         v->push();
         if (prv == nullptr) {
-            prv = v->prev();
+            prv = v->non_push_prev();
         }
         if (prv != nullptr && prv != v && !prv->forDelete) {
             prv->updateOurType();
             prv->type_r = our_type;
             v->type_l = prv->our_type;
-            prv->update_up();
         } else {
             v->type_l = INT_MAX;
         }
@@ -363,7 +392,7 @@ public:
         d_gradient = 0;
         if (need_update_types) {
             if (l != nullptr) {
-                l->update_our_t();
+                l->update_types();
             }
             if (r != nullptr) {
                 r->update_types();
