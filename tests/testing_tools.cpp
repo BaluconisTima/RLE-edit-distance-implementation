@@ -37,7 +37,8 @@ void generate_hard_test(int n, int check_count, int blocks_per_add, int block_si
 }
 
 vector<pair<char, int> > compressed_string_generator(int block_number_limit, int block_size_limit, int char_limit_l, int char_limit_r) {
-    int n = rand() % block_number_limit + 1;
+    // int n = rand() % block_number_limit + 1;
+    int n = block_number_limit;
     vector<pair<char, int> > compressed_string;
     for (int i = 0; i < n; i++) {
         int rnd = rand() % (char_limit_r - char_limit_l + 1) + char_limit_l;
@@ -53,35 +54,158 @@ double rnd() {
 }
 
 void generate_hard_test2(int n, int blocks_change_base, int sizes_cap) {
-    auto a = compressed_string_generator(n, sizes_cap, 0, 5),
-         b = compressed_string_generator(10, sizes_cap, 0, 5);
-    float temp = 1;
-    float last_ans = 0;
-    while (last_ans < 15) {
-        temp *= 0.99;
-        int changes = blocks_change_base * temp;
+    auto a = compressed_string_generator(50, sizes_cap, 0, 3),
+         b = compressed_string_generator(50, sizes_cap, 0, 3);
+
+    a = {
+        {'a', 185},
+        {'e', 928},
+        {'b', 150},
+        {'e', 258},
+        {'b', 119},
+        {'e', 109},
+        {'e', 85},
+        {'b', 84},
+        {'e', 59},
+        {'a', 134},
+        {'b', 1},
+        {'e', 81},
+        {'a', 600},
+        {'e', 335},
+        {'a', 180},
+        {'e', 234},
+        {'a', 31},
+        {'e', 434},
+        {'a', 724},
+        {'b', 71},
+        {'e', 303},
+        {'e', 409},
+        {'a', 34},
+        {'a', 124},
+        {'b', 25},
+        {'e', 306},
+        {'b', 108},
+        {'a', 37},
+        {'b', 4},
+        {'e', 559},
+        {'a', 12},
+        {'b', 9},
+        {'a', 118},
+        {'b', 88},
+        {'a', 68},
+        {'e', 74},
+        {'c', 16},
+        {'b', 53},
+        {'a', 4},
+        {'e', 21},
+        {'a', 5},
+        {'b', 5},
+        {'a', 21},
+        {'b', 8},
+        {'a', 76},
+        {'b', 6},
+        {'e', 1},
+        {'b', 65},
+        {'a', 66},
+        {'e', 59},
+        {'b', 13},
+        {'b', 8},
+        {'a', 3},
+        {'b', 2},
+        {'a', 33},
+        {'b', 7},
+        {'a', 34},
+        {'d', 736},
+        {'a', 3},
+        {'d', 875},
+        {'c', 711},
+        {'d', 622},
+        {'d', 591},
+        {'e', 201},
+        {'a', 18},
+        {'b', 37},
+        {'a', 61},
+        {'b', 2},
+        {'a', 33},
+        {'b', 1},
+        {'a', 68},
+        {'b', 43},
+        {'a', 9},
+        {'a', 11},
+        {'b', 2},
+        {'e', 117},
+        {'a', 27},
+        {'a', 3},
+        {'b', 7},
+        {'a', 36},
+        {'b', 21},
+        {'a', 140},
+        {'e', 139},
+        {'b', 121},
+        {'b', 20},
+        {'e', 10},
+        {'b', 9},
+        {'b', 78},
+        {'a', 11},
+        {'b', 7},
+        {'b', 16},
+        {'a', 44},
+        {'b', 25},
+        {'a', 16},
+        {'d', 1},
+        {'a', 20},
+        {'a', 18},
+        {'b', 13},
+        {'a', 65},
+        {'a', 956},
+    };
+    b = {
+        {'b', 949},
+        {'e', 724},
+        {'b', 996},
+        {'a', 998},
+        {'a', 999},
+    };
+
+    chen_chao_advance_solution(a, b);
+    float temp = 0;
+    float last_ans = avg_segments_count_chen_chao;
+
+    while (last_ans < 20) {
+        //temp *= 0.99;
+        int changes = blocks_change_base;
         changes = rand() % (changes + 1) + 1;
         auto a1 = a, b1 = b;
         while (changes--) {
-            if (rand() % 2 == 0) {
+            if (rand() % 3) {
                 int index = rand() % a1.size();
-                a1[index].first = 'a' + rand() % 5;
-                a1[index].second = 1000 + rand() % sizes_cap + 1;
+                a1[index].first = 'a' + rand() % 2;
+                a1[index].second = rand() % sizes_cap + 1;
             } else {
                 int index = rand() % b1.size();
-                b1[index].first = 'a' + rand() % 5;
+                b1[index].first = 'a' + rand() % 2;
                 b1[index].second = rand() % sizes_cap + 1;
             }
         }
         int ans = chen_chao_advance_solution(a1, b1);
         float new_ans = avg_segments_count_chen_chao;
-        if (new_ans > last_ans || rnd() < exp((new_ans - last_ans) / temp)) {
+        if (new_ans > last_ans || rnd() < exp((new_ans - last_ans) / max((float)0.00001, temp))) {
             cerr << new_ans << endl;
             last_ans = new_ans;
             a = a1;
             b = b1;
         }
     }
+    cerr << "a = {\n";
+    for (auto &p: a) {
+        cerr << "    {'" << p.first << "', " << p.second << "},\n";
+    }
+    cerr << "};\n";
+    cerr << "b = {\n";
+    for (auto &p: b) {
+        cerr << "    {'" << p.first << "', " << p.second << "},\n";
+    }
+    cerr << "};\n";
 }
 
 

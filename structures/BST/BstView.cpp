@@ -8,6 +8,7 @@
 using namespace std;
 #include "BstNode.cpp"
 #include "../../common/utils.cpp"
+#define float long double
 
 namespace treap {
     void print_tree(node *v) {
@@ -201,13 +202,13 @@ namespace treap {
             rv->set_segment(rv->get_xl(), lu->get_xr(), rv->get_yl(), lu->get_yr());
             u = remove(lu);
             lu = u->get_leftmost();
-            if (lu != nullptr) {
-                lu->update_types();
-            }
-            if (rv != nullptr) {
-                rv->update_types();
-            }
             if (u == nullptr) {
+                if (lu != nullptr) {
+                    lu->update_types();
+                }
+                if (rv != nullptr) {
+                    rv->update_types();
+                }
                 return v;
             }
         } else
@@ -218,14 +219,8 @@ namespace treap {
                 v = merge(v, nf);
                 rv->update_types();
                 nf->update_types();
-                rv = v->get_rightmost();
+                rv = nf;
             }
-        if (lu != nullptr) {
-            lu->update_types();
-        }
-        if (rv != nullptr) {
-            rv->update_types();
-        }
         auto nr = merge(v, u);
         rv->update_types();
         lu->update_types();
@@ -237,14 +232,16 @@ namespace treap {
         auto lv = v->get_leftmost();
         if (abs(lv->get_xl() - xm) < 0.00001) {
             auto boarder = new node(xm, xm, lv->get_yl(), lv->get_yl());
-            lv->update_up();
+            lv->update_types();
+            boarder->update_types();
             return {boarder, v};
         }
 
         auto rv = v->get_rightmost();
         if (abs(rv->get_xr() - xm) < 0.00001) {
             auto boarder = new node(xm, xm, rv->get_yr(), rv->get_yr());
-            rv->update_up();
+            rv->update_types();
+            boarder->update_types();
             return {v, boarder};
         }
         pair<node *, node *> p = split(v, xm);
@@ -264,8 +261,8 @@ namespace treap {
                 p.second = remove(ls);
             }
         }
-        p.second->get_leftmost()->update_types();
-        p.first->get_rightmost()->update_types();
+        p.first->update_boarders();
+        p.second->update_boarders();
         return p;
     }
 
@@ -321,6 +318,7 @@ namespace treap {
             if (diff >= 0.00001 || abs(diff) < 0.00001) {
                 if (abs(diff) < 0.00001) {
                     xm = m / 2.0;
+                    break;
                 }
                 r = m - 1;
             } else {
@@ -355,12 +353,11 @@ namespace treap {
         if (abs(left->get_xl() - left->get_xr()) < 0.00001) {
             result = remove(left);
         }
-        result->get_leftmost()->update_up();
         auto right = result->get_rightmost();
         if (abs(right->get_xl() - right->get_xr()) < 0.00001) {
             result = remove(right);
         }
-        result->get_rightmost()->update_up();
+        result->update_boarders();
         return result;
     }
 
@@ -369,7 +366,7 @@ namespace treap {
             return;
         }
         v->updated_time_hash = 1;
-        if (v->get_tmin() != time_to_collapse) {
+        if (v->get_tmin() > time_to_collapse) {
             return;
         }
         v->push();
@@ -388,8 +385,8 @@ namespace treap {
         if (v == nullptr) {
             return;
         }
-        v->push();
         if (!v->updated_time_hash) return;
+        v->push();
         v->updated_time_hash = 0;
         update_all_toched(v->l);
         update_all_toched(v->r);
@@ -409,31 +406,29 @@ namespace treap {
             cerr << "Error: safeRemoveNode called on node with tmin != 0" << endl;
             exit(-1);
         }
-        if (prv != nullptr) {
-            prv->update_types();
-        }
-        if (nxt != nullptr) {
-            nxt->update_types();
-        }
+
         if (prv != nullptr && nxt != nullptr && !nxt->forDelete && !prv->forDelete) {
             if (line_type(prv->get_xl(), prv->get_yl(), prv->get_xr(), prv->get_yr()) ==
                 line_type(nxt->get_xl(), nxt->get_yl(), nxt->get_xr(), nxt->get_yr())) {
-                auto pre_nxt = nxt->next();
-                root = remove(nxt);
                 prv->set_segment(prv->get_xl(), nxt->get_xr(), prv->get_yl(), nxt->get_yr());
-                prv->update_types();
-                if (pre_nxt != nullptr) {
-                    pre_nxt->update_types();
-                }
+                auto nxt_nxt = nxt->next();
+                root = remove(nxt);
+                nxt = nxt_nxt;
             } else
                 if (line_type(prv->get_xl(), prv->get_yl(), prv->get_xr(), prv->get_yr()) == -1 &&
                     line_type(nxt->get_xl(), nxt->get_yl(), nxt->get_xr(), nxt->get_yr()) == 1) {
-                    auto p = smart_split(nxt, prv->get_xr());
+                    auto p = smart_split(root, prv->get_xr());
                     auto rv = p.first, lv = p.second;
                     auto nw = new node(prv->get_xr(), prv->get_xr(), prv->get_yr(), nxt->get_yr());
                     root = smart_merge(rv, nw);
                     root = smart_merge(root, lv);
                 }
+        }
+        if (prv != nullptr) {
+            prv->update_types();
+        }
+        if (nxt != nullptr) {
+            nxt->update_types();
         }
         return root;
     }
@@ -445,16 +440,14 @@ namespace treap {
         if (line_type(left->get_xl(), left->get_yl(), left->get_xr(), left->get_yr()) == 1) {
             auto nw = new node(left->get_xl(), left->get_xl(), left->get_yl(), left->get_yl());
             v = smart_merge(nw, v);
-            left->update_types();
-            nw->update_types();
         }
 
         if (line_type(right->get_xl(), right->get_yl(), right->get_xr(), right->get_yr()) == -1) {
             auto nw = new node(right->get_xr(), right->get_xr(), right->get_yr(), right->get_yr());
             v = smart_merge(v, nw);
-            right->update_types();
-            nw->update_types();
         }
+        left->update_types();
+        right->update_types();
 
         v->update_boarders();
         return v;
@@ -473,6 +466,7 @@ namespace treap {
             int x = min(h, v->get_tmin());
             if (x < 0) {
                 cerr << "Error: SWM called with negative tmin" << endl;
+                print_tree(v);
                 exit(-1);
             }
             if (x == 0) {
@@ -481,28 +475,26 @@ namespace treap {
             }
             h -= x;
             vector<node *> nodes;
+
             find_colapsed(v, nodes, x);
             v->add_t_root(x);
             update_all_toched(v);
 
             for (auto &node: nodes) {
                 v = safeRemoveNode(v, node);
-                v = update_boarders(v);
+                //v = update_boarders(v);
             }
         }
         auto left = v->get_leftmost();
         if (abs(left->get_xl() - left->get_xr()) < 0.00001) {
-            v = remove(left);
+            v = safeRemoveNode(v, left);
         }
         auto right = v->get_rightmost();
         if (abs(right->get_xl() - right->get_xr()) < 0.00001) {
-            v = remove(right);
+            v = safeRemoveNode(v, right);
         }
+        v->update_boarders();
 
-        left = v->get_leftmost();
-        left->update_types();
-        right = v->get_rightmost();
-        right->update_types();
         return v;
     }
 } // namespace treap

@@ -2,6 +2,7 @@
 #define CHEN_CHA0_ADVANCE_C
 #include <bits/stdc++.h>
 #include "../structures/GeometricView.cpp"
+#define float long double
 
 using namespace std;
 

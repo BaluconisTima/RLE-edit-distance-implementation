@@ -4,7 +4,7 @@
 #include <bits/stdc++.h>
 #include "../structures/GeometricView.cpp"
 using namespace std;
-
+#define float long double
 vector<pair<char, int> > compress_string(string &original_string) {
     vector<pair<char, int> > compressed_string;
     char current_char = original_string[0];

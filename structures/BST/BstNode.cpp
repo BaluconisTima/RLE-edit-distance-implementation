@@ -11,6 +11,8 @@ vector<vector<pair<float, float> > > shifts = {
     {{0.5, -0.5}, {1, 0}, {40000000000.0, 40000000000.0}}
 };
 
+int types_updated_counter = 0;
+
 class node {
 public:
     node *next() {
@@ -89,10 +91,15 @@ public:
     }
 
     void update_types() {
+        types_updated_counter++;
         if (forDelete) {
             return;
         }
+        int our_type_old = our_type;
         updateOurType();
+        // if (our_type_old == our_type) {
+        //     return;
+        // }
         update_left();
         update_right();
         update_up();
@@ -138,7 +145,6 @@ public:
         xr = _xr;
         yl = _yl;
         yr = _yr;
-        update_types();
         pull();
         //update_types();
     }
@@ -210,10 +216,6 @@ public:
     }
 
     void update_up() {
-        if (this == nullptr) {
-            cerr << "null func" << endl;
-            exit(-1);
-        }
         auto cur = this;
         while (cur != nullptr) {
             cur->pull();
@@ -228,8 +230,6 @@ public:
         rm->push();
         lm->update_types();
         rm->update_types();
-        lm->update_up();
-        rm->update_up();
     }
 
 private:
@@ -358,11 +358,12 @@ public:
         dt = 0;
         deltax = 0;
         deltay = 0;
+
         bool need_update_types = (abs(d_gradient) > 0.001);
         d_gradient = 0;
         if (need_update_types) {
             if (l != nullptr) {
-                l->update_types();
+                l->update_our_t();
             }
             if (r != nullptr) {
                 r->update_types();
