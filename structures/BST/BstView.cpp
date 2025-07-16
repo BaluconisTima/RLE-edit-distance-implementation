@@ -12,6 +12,7 @@ using namespace std;
 
 namespace treap {
     void print_tree(node *v) {
+        return;
         if (v->p != nullptr) {
             cerr << "Node: " << v << " Parent: " << v->p << '\n';
             exit(-1);
@@ -464,13 +465,9 @@ namespace treap {
             cerr << "Error: SWM called with h < 0" << endl;
             exit(-1);
         }
-        cerr << "SWM called with h = " << h << endl;
-        print_tree(v);
 
         while (h > 0) {
             v = update_boarders(v);
-            cerr << "After update_boarders" << endl;
-            print_tree(v);
             int x = min(h, v->get_tmin());
             if (x < 0) {
                 cerr << "Error: SWM called with negative tmin" << endl;
@@ -482,7 +479,6 @@ namespace treap {
                 exit(-1);
             }
             h -= x;
-            cerr << "Time to remove: " << x << endl;
             vector<node *> nodes;
 
             find_colapsed(v, nodes, x);
@@ -491,12 +487,9 @@ namespace treap {
 
 
             for (auto &node: nodes) {
-                cerr << "Removing node: " << node << endl;
                 v = safeRemoveNode(v, node);
-                //print_tree(v);
                 v = update_boarders(v);
             }
-            cerr << "After deletes" << endl;
             print_tree(v);
         }
         auto left = v->get_leftmost();
@@ -507,7 +500,6 @@ namespace treap {
         if (abs(right->get_xl() - right->get_xr()) < 0.00001) {
             v = safeRemoveNode(v, right);
         }
-        print_tree(v);
         v->update_boarders();
 
         return v;

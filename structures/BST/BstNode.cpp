@@ -59,7 +59,8 @@ public:
         if (nxt != nullptr && nxt != v && !nxt->forDelete) {
             v->type_r = nxt->getOurType();
         } else {
-            v->type_r = INT_MAX;
+            if (nxt == nullptr || nxt == v)
+                v->type_r = INT_MAX;
         }
         v->pull();
     }
@@ -73,7 +74,8 @@ public:
         if (prv != nullptr && prv != v && !prv->forDelete) {
             v->type_l = prv->getOurType();
         } else {
-            v->type_l = INT_MAX;
+            if (prv == nullptr || prv == v)
+                v->type_l = INT_MAX;
         }
         v->pull();
     }
@@ -90,8 +92,7 @@ public:
         if (forDelete) {
             return;
         }
-        push_t();
-
+        push();
         update_left();
         update_right();
         update_our_time();
