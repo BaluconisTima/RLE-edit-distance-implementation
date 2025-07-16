@@ -402,6 +402,7 @@ namespace treap {
         }
         auto prv = node1->prev(),
                 nxt = node1->next();
+
         if (node1->forDelete) {
             root = remove(node1);
         } else {
@@ -439,6 +440,7 @@ namespace treap {
     }
 
     node *update_boarders(node *v) {
+        v->update_boarders();
         auto left = v->get_leftmost();
         auto right = v->get_rightmost();
 
@@ -487,12 +489,15 @@ namespace treap {
             v->add_t_root(x);
             update_all_toched(v);
 
+
             for (auto &node: nodes) {
                 cerr << "Removing node: " << node << endl;
                 v = safeRemoveNode(v, node);
-                print_tree(v);
+                //print_tree(v);
                 v = update_boarders(v);
             }
+            cerr << "After deletes" << endl;
+            print_tree(v);
         }
         auto left = v->get_leftmost();
         if (abs(left->get_xl() - left->get_xr()) < 0.00001) {

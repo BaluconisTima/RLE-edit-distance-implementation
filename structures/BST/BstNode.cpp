@@ -90,6 +90,8 @@ public:
         if (forDelete) {
             return;
         }
+        push_t();
+
         update_left();
         update_right();
         update_our_time();
@@ -337,6 +339,7 @@ public:
         xr += shift_right.first * dt;
         yl += shift_left.second * dt;
         yr += shift_right.second * dt;
+        our_time_cur -= dt;
         dt = 0;
     }
 
@@ -351,6 +354,7 @@ public:
         yr = get_yr();
         xl = get_xl();
         xr = get_xr();
+        our_time_cur -= dt;
         dt = 0;
         deltax = 0;
         deltay = 0;
