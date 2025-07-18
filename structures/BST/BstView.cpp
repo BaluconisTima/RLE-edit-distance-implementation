@@ -24,8 +24,8 @@ namespace treap {
         cerr << "------------------------\n";
         int tmin = INT_MAX;
         while (true) {
-            cerr << fixed << setprecision(2) << cur->get_xl() << ' ' << cur->get_yl() << ' ' << cur->get_xr() << ' ' <<
-                    cur->get_yr() << " | " << cur->type_l << ' ' << cur->getOurType() << ' ' << cur->type_r
+            cerr << fixed << setprecision(2) << cur <<  ' ' << cur->get_xl() << ' ' << cur->get_yl() << ' ' << cur->get_xr() << ' ' <<
+                    cur->get_yr() << " | " << cur->type_l << ' ' << cur->our_type << ' ' << cur->type_r
                     << " | " << cur->our_time_cur << ' ' << cur->get_tmin() << ' ' << cur->dt << ' ' << cur->d_gradient <<
                     ' ' << cur->deltax << ' ' << cur->deltay << '\n';
             tmin = min(tmin, cur->get_tmin());
@@ -264,12 +264,15 @@ namespace treap {
                 p.second = remove(ls);
             }
         }
-        p.first->update_boarders();
-        p.second->update_boarders();
+        p.first->update_2_boarders();
+        p.second->update_2_boarders();
         return p;
     }
 
     node *combine(node *v, node *u) {
+        // cerr << "Combining trees" << endl;
+        // print_tree(v);
+        // print_tree(u);
         if (v == nullptr) {
             return u;
         }
@@ -278,11 +281,12 @@ namespace treap {
         }
         auto rv = v->get_rightmost(), ru = u->get_rightmost();
         auto lv = v->get_leftmost(), lu = u->get_leftmost();
-
-        if (lv->get_yl() - lu->get_yl() < 0.000001) {
+        // cerr << "abs left " << abs(lv->get_xl() - lu->get_xl()) << ' ' << abs(lv->get_yl() - lu->get_yl()) << endl;
+        if (abs(lv->get_yl() - lu->get_yl()) < 0.000001) {
+            // cerr << "abacaba" << endl;
             return v;
         }
-        if (rv->get_yr() - ru->get_yr() > 0.00001) {
+        if (rv->get_yr() - ru->get_yr() > 0.001) {
             return u;
         }
         if (lv->get_xl() != lu->get_xl() || rv->get_xr() != rv->get_xr()) {
@@ -292,10 +296,12 @@ namespace treap {
         while (lv != nullptr) {
             while (lv->get_xr() - lu->get_xr() > 0.00001) {
                 lu = lu->next();
+                lu->update_types();
             }
             float val = value_in_m(lu->get_xl(), lu->get_yl(), lu->get_xr(), lu->get_yr(), lv->get_xr());
             if (lv->get_yr() - val > 0.00001) {
                 lv = lv->next();
+                lv->update_types();
                 continue;
             } else break;
         }
@@ -303,16 +309,19 @@ namespace treap {
         while (ru != nullptr) {
             while (rv->get_xl() - ru->get_xl() > 0.00001) {
                 rv = rv->prev();
+                rv->update_types();
             }
             float val = value_in_m(rv->get_xl(), rv->get_yl(), rv->get_xr(), rv->get_yr(), ru->get_xl());
             if (!(abs(val - ru->get_yl()) > 0.00001 && val > ru->get_yl())) {
                 ru = ru->prev();
+                ru->update_types();
                 continue;
             } else break;
         }
 
         float xm = -INT_MIN;
         int l = max(lv->get_xl(), ru->get_xl()) * 2.0, r = min(lv->get_xr(), ru->get_xr()) * 2.0;
+        // cerr << "l " << l << ' ' << r << endl;
         while (l <= r) {
             int m = (l + r) / 2;
             float diff = value_in_m(ru->get_xl(), ru->get_yl(), ru->get_xr(), ru->get_yr(), m / 2.0) -
@@ -328,6 +337,7 @@ namespace treap {
                 l = m + 1;
             }
         }
+        // cerr << "xm " << xm << endl;
 
         if (xm < 0) {
             cerr << "Error: combine: xm is -INT_MIN" << endl;
@@ -465,9 +475,13 @@ namespace treap {
             cerr << "Error: SWM called with h < 0" << endl;
             exit(-1);
         }
+        // cerr << "SWM called with h = " << h << endl;
+        // print_tree(v);
 
         while (h > 0) {
             v = update_boarders(v);
+            // cerr << "After update_boarders" << endl;
+            // print_tree(v);
             int x = min(h, v->get_tmin());
             if (x < 0) {
                 cerr << "Error: SWM called with negative tmin" << endl;
@@ -479,6 +493,7 @@ namespace treap {
                 exit(-1);
             }
             h -= x;
+            // cerr << "Removing nodes with tmin <= " << x << endl;
             vector<node *> nodes;
 
             find_colapsed(v, nodes, x);
@@ -487,11 +502,17 @@ namespace treap {
 
 
             for (auto &node: nodes) {
+                // cerr << "Removing node: " << node << endl;
                 v = safeRemoveNode(v, node);
                 v = update_boarders(v);
             }
+
+            // cerr << "After removing nodes" << endl;
             print_tree(v);
         }
+
+        // cerr << "After SWM" << endl;
+        print_tree(v);
         auto left = v->get_leftmost();
         if (abs(left->get_xl() - left->get_xr()) < 0.00001) {
             v = safeRemoveNode(v, left);

@@ -82,9 +82,9 @@ public:
 
     int getOurType() {
         push_t();
-        int our_type = line_type(get_xl(), get_yl(), get_xr(), get_yr());
+        int new_our_type = line_type(get_xl(), get_yl(), get_xr(), get_yr());
         pull();
-        return our_type;
+        return new_our_type;
     }
 
     void update_types() {
@@ -93,6 +93,7 @@ public:
             return;
         }
         push();
+        our_type = getOurType();
         update_left();
         update_right();
         update_our_time();
@@ -106,7 +107,7 @@ public:
     node *p;
     // declare extra variables:
     int P;
-    int type_l, type_r, dt;
+    int type_l, type_r, our_type, dt;
     float deltax, deltay;
     float d_gradient = 0;
     bool forDelete = false;
@@ -141,7 +142,7 @@ public:
         yl = _yl;
         yr = _yr;
         pull();
-        //update_types();
+        update_types();
     }
 
     int dist() {
@@ -150,9 +151,9 @@ public:
     }
 
     void update_our_time() {
-        if ((type_l == 1 && getOurType() == -1 && type_r == 0) ||
-            (type_l == 1 && getOurType() == 0 && type_r == -1) ||
-            (type_l == 0 && getOurType() == 1 && type_r == -1)) {
+        if ((type_l == 1 && our_type == -1 && type_r == 0) ||
+            (type_l == 1 && our_type == 0 && type_r == -1) ||
+            (type_l == 0 && our_type == 1 && type_r == -1)) {
             our_time_cur = dist();
             return;
         }
@@ -168,8 +169,8 @@ public:
             return;
         }
         extra_shift_left = {
-            shifts[type_l + 1][getOurType() + 1].first,
-            shifts[type_l + 1][getOurType() + 1].second
+            shifts[type_l + 1][our_type + 1].first,
+            shifts[type_l + 1][our_type + 1].second
         };
     }
 
@@ -179,8 +180,8 @@ public:
             return;
         }
         extra_shift_right = {
-            shifts[getOurType() + 1][type_r + 1].first,
-            shifts[getOurType() + 1][type_r + 1].second
+            shifts[our_type + 1][type_r + 1].first,
+            shifts[our_type + 1][type_r + 1].second
         };
     }
 
@@ -234,6 +235,28 @@ public:
         rm->update_types();
     }
 
+    void update_2_boarders() {
+        update_types();
+        auto lm = get_leftmost(),
+                rm = get_rightmost();
+        lm->push();
+        rm->push();
+        lm->update_types();
+        rm->update_types();
+
+        lm = lm->next();
+        if (lm != nullptr) {
+            lm->push();
+            lm->update_types();
+        }
+
+        rm = rm->prev();
+        if (rm != nullptr) {
+            rm->push();
+            rm->update_types();
+        }
+    }
+
 private:
     void add_t(int t) {
         if (d_gradient == 0) {
@@ -251,8 +274,15 @@ private:
     }
 
     void move_gradient(float d) {
+        push_t();
+        if (abs(our_type) < 2) our_type += d;
+        if (abs(type_l) < 2) type_l += d;
+        if (abs(type_r) < 2) type_r += d;
         deltay += d * deltax;
         d_gradient += d;
+        update_extra_shift_left();
+        update_extra_shift_right();
+        update_up();
     }
 
 public:
@@ -283,6 +313,7 @@ public:
             exit(-1);
         }
         move_gradient(d);
+        pull();
         update_boarders();
     }
 
@@ -359,17 +390,7 @@ public:
         dt = 0;
         deltax = 0;
         deltay = 0;
-
-        bool need_update_types = (abs(d_gradient) > 0.001);
         d_gradient = 0;
-        if (need_update_types) {
-            if (l != nullptr) {
-                l->update_types();
-            }
-            if (r != nullptr) {
-                r->update_types();
-            }
-        }
         pull();
     }
 
