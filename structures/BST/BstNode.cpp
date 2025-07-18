@@ -282,7 +282,8 @@ private:
         d_gradient += d;
         update_extra_shift_left();
         update_extra_shift_right();
-        update_up();
+        pull();
+        //update_up();
     }
 
 public:
