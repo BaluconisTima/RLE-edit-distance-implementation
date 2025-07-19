@@ -12,7 +12,7 @@ using namespace std;
 
 namespace treap {
     void print_tree(node *v) {
-        return;
+        //return;
         if (v->p != nullptr) {
             cerr << "Node: " << v << " Parent: " << v->p << '\n';
             exit(-1);
@@ -58,6 +58,24 @@ namespace treap {
             cerr << "Error: tree is not valid" << '\n';
             exit(-1);
         }
+    }
+
+    node *find(node * v, float x) {
+        if (v == nullptr) {
+            return nullptr;
+        }
+        v->push();
+        node *ans = nullptr;
+        if (v->get_xl() <= x && x <= v->get_xr()) {
+            ans = v;
+        } else
+        if (x < v->get_xl()) {
+            ans = find(v->l, x);
+        } else {
+            ans = find(v->r, x);
+        }
+        v->pull();
+        return ans;
     }
 
     node *merge(node *v, node *u) {
@@ -283,7 +301,6 @@ namespace treap {
         auto lv = v->get_leftmost(), lu = u->get_leftmost();
         // cerr << "abs left " << abs(lv->get_xl() - lu->get_xl()) << ' ' << abs(lv->get_yl() - lu->get_yl()) << endl;
         if (abs(lv->get_yl() - lu->get_yl()) < 0.000001) {
-            // cerr << "abacaba" << endl;
             return v;
         }
         if (rv->get_yr() - ru->get_yr() > 0.001) {
@@ -294,10 +311,11 @@ namespace treap {
         }
 
         while (lv != nullptr) {
-            while (lv->get_xr() - lu->get_xr() > 0.00001) {
-                lu = lu->next();
-                lu->update_types();
-            }
+            // while (lv->get_xr() - lu->get_xr() > 0.00001) {
+            //     lu = lu->next();
+            //     lu->update_types();
+            // }
+            lu = find(u, lv->get_xr());
             float val = value_in_m(lu->get_xl(), lu->get_yl(), lu->get_xr(), lu->get_yr(), lv->get_xr());
             if (lv->get_yr() - val > 0.00001) {
                 lv = lv->next();
@@ -307,10 +325,11 @@ namespace treap {
         }
 
         while (ru != nullptr) {
-            while (rv->get_xl() - ru->get_xl() > 0.00001) {
-                rv = rv->prev();
-                rv->update_types();
-            }
+            // while (rv->get_xl() - ru->get_xl() > 0.00001) {
+            //     rv = rv->prev();
+            //     rv->update_types();
+            // }
+            rv = find(v, ru->get_xl());
             float val = value_in_m(rv->get_xl(), rv->get_yl(), rv->get_xr(), rv->get_yr(), ru->get_xl());
             if (!(abs(val - ru->get_yl()) > 0.00001 && val > ru->get_yl())) {
                 ru = ru->prev();
@@ -441,10 +460,10 @@ namespace treap {
                     root = smart_merge(root, lv);
                 }
         }
-        if (prv != nullptr) {
+        if (prv != nullptr && !prv->forDelete) {
             prv->update_types();
         }
-        if (nxt != nullptr) {
+        if (nxt != nullptr && !nxt->forDelete) {
             nxt->update_types();
         }
         return root;
@@ -464,7 +483,7 @@ namespace treap {
             auto nw = new node(right->get_xr(), right->get_xr(), right->get_yr(), right->get_yr());
             v = smart_merge(v, nw);
         }
-        v->update_boarders();
+        v->update_2_boarders();
         return v;
     }
 
@@ -502,17 +521,17 @@ namespace treap {
 
 
             for (auto &node: nodes) {
-                // cerr << "Removing node: " << node << endl;
+                //cerr << "Removing node: " << node << endl;
                 v = safeRemoveNode(v, node);
-                v = update_boarders(v);
+                //print_tree(v);
             }
 
-            // cerr << "After removing nodes" << endl;
-            print_tree(v);
+            //  cerr << "After removing nodes" << endl;
+            // print_tree(v);
         }
 
-        // cerr << "After SWM" << endl;
-        print_tree(v);
+        //  cerr << "After SWM" << endl;
+        // print_tree(v);
         auto left = v->get_leftmost();
         if (abs(left->get_xl() - left->get_xr()) < 0.00001) {
             v = safeRemoveNode(v, left);

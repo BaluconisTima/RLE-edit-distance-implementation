@@ -99,6 +99,7 @@ public:
         update_our_time();
         update_extra_shift_left();
         update_extra_shift_right();
+        pull();
         update_up();
     }
 
@@ -143,6 +144,18 @@ public:
         yr = _yr;
         pull();
         update_types();
+        auto nxt = next();
+        if (nxt != nullptr && !nxt->forDelete && nxt != this) {
+           nxt->push();
+           nxt->pull();
+           nxt->update_types();
+        }
+        auto prv = prev();
+        if (prv != nullptr && !prv->forDelete && prv != this) {
+            prv->push();
+            prv->pull();
+            prv->update_types();
+        }
     }
 
     int dist() {
@@ -262,7 +275,7 @@ private:
         if (d_gradient == 0) {
             dt += t;
         } else {
-            if (type_l == 1 || type_r == 1) {
+            if (type_l == 1 || type_r == 1 || our_type == 1) {
                 deltax += t;
             }
         }
@@ -274,16 +287,17 @@ private:
     }
 
     void move_gradient(float d) {
+        if (d == 0) return;
         push_t();
         if (abs(our_type) < 2) our_type += d;
         if (abs(type_l) < 2) type_l += d;
         if (abs(type_r) < 2) type_r += d;
-        deltay += d * deltax;
-        d_gradient += d;
         update_extra_shift_left();
         update_extra_shift_right();
+
+        deltay += d * deltax;
+        d_gradient += d;
         pull();
-        //update_up();
     }
 
 public:

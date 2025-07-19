@@ -68,8 +68,8 @@ node *calculateOutMismatch(node *left, node *top) {
         // cerr << "split_t" << endl;
         // print_tree(split_t.first);
         split_t.first->add_delta_root(0, h - 1);
-        // cerr << "split_t.first after add_delta_root" << endl;
-        // print_tree(split_t.first);
+        // cerr << "split_t.first before grad" << endl;
+        // print_tree(split_t.second);
         split_t.second->move_gradient_root(-1);
         // cerr << "split_t.second" << endl;
         // print_tree(split_t.second);
