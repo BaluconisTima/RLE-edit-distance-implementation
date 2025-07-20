@@ -1,9 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <utility>
-#include "../solutions/near_optimal.cpp"
-#include "../solutions/chen_chao_advance.cpp"
+#include "../../solutions/near_optimal.cpp"
+#include "../../solutions/chen_chao_advance.cpp"
 using namespace std;
+
+
 
 void generate_hard_test(int n, int check_count, int blocks_per_add, int block_size) {
     vector<pair<char, int>> a, b;
@@ -48,6 +50,7 @@ vector<pair<char, int> > compressed_string_generator(int block_number_limit, int
     }
     return compressed_string;
 }
+
 double rnd() {
      int r = rand() % 10000;
     return (double) r / (double) 10000;
@@ -214,6 +217,23 @@ vector<pair<char, int> > compressed_string_generator(int block_number_limit, int
     return compressed_string_generator(block_number_limit, block_size_limit, 0, char_limit);
 }
 
+
+vector<pair<char, int> > generate_string_for_not_compress_algorithms(int block_number_limit, int block_size_limit, int char_limit, int total_size_limit) {
+    auto a = compressed_string_generator(block_number_limit, block_size_limit, char_limit);
+    int total_sz = 0;
+    for (auto to: a) {
+        total_sz += to.second;
+    }
+    while (total_sz > total_size_limit) {
+        total_sz -= a.back().second;
+        if (total_sz < total_size_limit) {
+            a.back().second = total_size_limit - total_sz;
+            break;
+        }
+        a.pop_back();
+    }
+    return a;
+}
 
 using callback_edit_distance = function<int(vector<pair<char, int> >&, vector<pair<char, int>> &)>;
 
