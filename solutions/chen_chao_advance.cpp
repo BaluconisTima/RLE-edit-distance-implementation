@@ -6,7 +6,7 @@
 
 using namespace std;
 
-GeometricView calculateOutMismatch(GeometricView left, GeometricView top) {
+GeometricView calculateOutMismatch(GeometricView &left, GeometricView &top) {
     bool is_rotated = false;
 
     if (left.points.back().first > top.points.back().first) {
@@ -40,10 +40,13 @@ GeometricView calculateOutMismatch(GeometricView left, GeometricView top) {
         top_2.push_back({to.first, to.second - to.first - 2 + w + h});
     }
 
+
     auto out = min(left_2, top_2);
+
     if (is_rotated) {
         reverse(out);
     }
+
     return out;
 }
 
@@ -60,12 +63,8 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
         ED_top[0][j].push_back({b[j].second, sum});
     }
     sum = 0;
-    for (int i = 0; i < a.size(); i++) {
-
-    }
 
     for (int i = 0; i < a.size(); i++) {
-
         ED_left[i%2][0] = GeometricView();
         ED_left[i%2][0].push_back({0, sum});
         sum += a[i].second;
@@ -83,12 +82,16 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
                 }
             } else {
                 // Mismatch block
+
                 out = calculateOutMismatch(left, top);
             }
+
             avg_segments_count_chen_chao += out.points.size();
 
             auto out_split = splitIncluding(out, b[j].second);
+
             ED_top[(i + 1)%2][j] = out_split.first;
+
             out_split.second.moveX(-out_split.second.points[0].first);
             ED_left[i%2][j + 1] = out_split.second;
             reverse(ED_left[i%2][j + 1]);
@@ -99,8 +102,9 @@ int chen_chao_advance_solution(vector<pair<char, int> > &a, vector<pair<char, in
             top.points.clear();
         }
     }
-    avg_segments_count_chen_chao /= (a.size() * b.size());
+    int ans = ED_top[a.size()%2][b.size() - 1].points.back().second;
 
-    return ED_top[a.size()%2][b.size() - 1].points.back().second;
+    avg_segments_count_chen_chao /= (a.size() * b.size());
+    return ans;
 }
 #endif

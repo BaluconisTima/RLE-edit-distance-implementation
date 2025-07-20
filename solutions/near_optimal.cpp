@@ -95,8 +95,6 @@ int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > 
     }
     sum = 0;
     types_updated_counter = 0;
-
-    float total_time = 0;
     for (int i = 0; i < a.size(); i++) {
         ED_left[i%2][0] = new node(0, a[i].second, sum + a[i].second, sum);
         sum += a[i].second;
@@ -109,13 +107,8 @@ int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > 
                 top->add_delta_root(left->get_rightmost()->get_xr(), 0);
                 out = smart_merge(left, top);
             } else {
-                auto c = clock();
-
                 // Mismatch block
                 out = calculateOutMismatch(left, top);
-                c = clock() - c;
-                float time = (float)c / CLOCKS_PER_SEC;
-                total_time += time;
             }
             out->pull();
             avg_segments_count += out->sz;
@@ -130,7 +123,6 @@ int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > 
             ED_left[i%2][j + 1] = out_split.second;
         }
     }
-    cerr << "Total time: " << total_time << " seconds" << endl;
     // cerr << "Types updated: " << types_updated_counter << endl;
     // cerr << "Average segments count: " << avg_segments_count << endl;
     // cerr << "const: " << types_updated_counter / (avg_segments_count * log(avg_segments_count)) << endl;

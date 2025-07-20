@@ -3,38 +3,86 @@
 
 #include <bits/stdc++.h>
 using namespace std;
+#define float long double
 
-bool check_on_line(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
-    return (b.first - a.first) * (c.second - a.second) == (b.second - a.second) * (c.first - a.first);
+bool check_on_line(pair<long long, long long> a, pair<long long, long long> b, pair<long long, long long> c) {
+    float d1 = (b.first - a.first);
+    d1 *= (c.second - a.second);
+
+    float d2 = (b.second - a.second);
+    d2 *= (c.first - a.first);
+    return abs(d1 - d2) < 0.00001;
 }
 
-pair<int, int> lines_intersection_by_points(pair<int, int> a, pair<int, int> b, pair<int, int> c, pair<int, int> d) {
-    long long x1 = a.first, y1 = a.second;
-    long long x2 = b.first, y2 = b.second;
-    long long x3 = c.first, y3 = c.second;
-    long long x4 = d.first, y4 = d.second;
+pair<pair<int, int>, pair<int, int>> normalize(pair<long long, long long> a, pair<long long, long long> b) {
+    if (a.first > b.first || (a.first == b.first && a.second > b.second)) {
+        swap(a, b);
+    }
+    if (a.first == b.first) {
+        b.second = a.second + 1;
+        return {a, b};
+    }
+    b.first = a.first + 1;
+    if (a.second < b.second) {
+        b.second = a.second + 1;
+    } else if (a.second > b.second) {
+        b.second = a.second - 1;
+    } else {
+        b.second = a.second;
+    }
+    return {a, b};
+}
 
-    long long d1 = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (d1 == 0) {
+pair<int, int> lines_intersection_by_points(pair<long long, long long> a, pair<long long, long long> b, pair<long long, long long> c, pair<long long, long long> d) {
+    auto normab = normalize(a, b);
+    auto normcd = normalize(c, d);
+    a = normab.first, b = normab.second;
+    c = normcd.first, d = normcd.second;
+
+    float x1 = a.first, y1 = a.second;
+    float x2 = b.first, y2 = b.second;
+    float x3 = c.first, y3 = c.second;
+    float x4 = d.first, y4 = d.second;
+
+    float d1 = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (abs(d1) < 0.00000001) {
         return {INT_MAX, INT_MAX};
     }
-
-    long long x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d1;
-    long long y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d1;
+    float factor1 = (x1 * y2 - y1 * x2);
+    float factor2 = (x3 * y4 - y3 * x4);
+    float xdiff34 = (x3 - x4);
+    float ydiff34 = (y3 - y4);
+    float xdiff12 = (x1 - x2);
+    float ydiff12 = (y1 - y2);
+    float x = (factor1 * xdiff34 - factor2 * xdiff12)/d1;
+    float y = (factor1 * ydiff34 - factor2 * ydiff12)/d1;
     return {x, y};
 }
 
-int in_point_value(pair<int, int> a, pair<int, int> b, int x) {
-    int d = (b.second - a.second) / (b.first - a.first);
+long long in_point_value(pair<long long, long long> a, pair<long long, long long> b, long long x) {
+    if (b.first == a.first) {
+        if (x == a.first) {
+            return a.second;
+        } else {
+            cerr << "Error in in_point_value: x is not on the line segment." << endl;
+            exit(1);
+        }
+    }
+    long long d = (b.second - a.second) / (b.first - a.first);
     return a.second + d * (x - a.first);
 }
 
 struct GeometricView {
     deque<pair<int, int> > points;
-
+    ~GeometricView() {
+        points.clear();
+    }
     void push_back(pair<int, int> point) {
         // check if it's already on line from prev two points:
         if (points.size() > 1) {
+            if (points.back() == point) {
+                return;
+            }
             if (check_on_line(points[points.size() - 2], points[points.size() - 1], point)) {
                 points.pop_back();
             }

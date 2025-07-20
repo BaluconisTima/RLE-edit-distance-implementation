@@ -49,7 +49,7 @@ int read_test_out(string filename) {
 }
 
 void update_tests(string test_folder) {
-    int total_test_cases = 0;
+    int total_test_cases = 120;
     while (true) {
         total_test_cases++;
         if (!ifstream(test_folder + "test" + to_string(total_test_cases) + ".in")) {
@@ -59,13 +59,13 @@ void update_tests(string test_folder) {
         auto a = test.first, b = test.second;
         ofstream file((test_folder + "test" + to_string(total_test_cases) + ".out").c_str());
         cerr << "Test #" << total_test_cases << endl;
-        int ans = chen_chao_naive_solution(a, b);
+        int ans = near_optimal_solution(a, b);
         file << ans << '\n';
     }
 }
 
 void test_folder_answers(string test_folder) {
-    int total_test_cases = 0;
+    int total_test_cases = 115;
     while (true) {
         total_test_cases++;
         cerr << "Test #" << total_test_cases << endl;
@@ -76,7 +76,7 @@ void test_folder_answers(string test_folder) {
         }
         int ans = read_test_out(test_folder + "test" + to_string(total_test_cases) + ".out");
         auto a = test.first, b = test.second;
-        auto ans2 = near_optimal_solution(a, b);
+        auto ans2 = chen_chao_advance_solution(a, b);
         if (ans != ans2) {
             cerr << "Error in test #" << total_test_cases << ": expected " << ans << ", got " << ans2 << endl;
             exit(1);
@@ -92,25 +92,95 @@ int main() {
     ios_base::sync_with_stdio(0);
     srand(time(0));
 
-    string test_folder = "tests/non-compressed/";
+    string test_folder = "tests/random/";
+     test_folder_answers(test_folder);
+     //update_tests(test_folder);
+    // int total_test_cases = 0;
+    // for (int i = 0; i < 50; i++) {
+    //     total_test_cases++;
+    //     auto a = compressed_string_generator(10,100000, 0, 26),
+    //          b = compressed_string_generator(10,100000, 0, 26);
+    //     ofstream file((test_folder + "test" + to_string(total_test_cases) + ".in").c_str());
+    //     file << a.size() << ' ' << b.size() << '\n';
+    //     for (auto &p: a) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file << '\n';
+    //     for (auto &p: b) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file.close();
+    // }
+    // for (int i = 0; i < 30; i++) {
+    //     total_test_cases++;
+    //     auto a = compressed_string_generator(100,1000, 0, 26),
+    //          b = compressed_string_generator(100,1000, 0, 26);
+    //     ofstream file((test_folder + "test" + to_string(total_test_cases) + ".in").c_str());
+    //     file << a.size() << ' ' << b.size() << '\n';
+    //     for (auto &p: a) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file << '\n';
+    //     for (auto &p: b) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file.close();
+    // }
+    // for (int i = 0; i < 40; i++) {
+    //     total_test_cases++;
+    //     auto a = compressed_string_generator(1000,1000, 0, 3),
+    //          b = compressed_string_generator(1000,1000, 0, 3);
+    //     ofstream file((test_folder + "test" + to_string(total_test_cases) + ".in").c_str());
+    //     file << a.size() << ' ' << b.size() << '\n';
+    //     for (auto &p: a) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file << '\n';
+    //     for (auto &p: b) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file.close();
+    // }
+    // for (int i = 0; i < 30; i++) {
+    //     total_test_cases++;
+    //     auto a = compressed_string_generator(1000,100000, 0, 3),
+    //          b = compressed_string_generator(1000,100000, 0, 3);
+    //     ofstream file((test_folder + "test" + to_string(total_test_cases) + ".in").c_str());
+    //     file << a.size() << ' ' << b.size() << '\n';
+    //     for (auto &p: a) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file << '\n';
+    //     for (auto &p: b) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file.close();
+    // }
+    // for (int i = 0; i < 20; i++) {
+    //     total_test_cases++;
+    //     auto a = compressed_string_generator(1000,100000, 0, 15),
+    //          b = compressed_string_generator(1000,100000, 0, 15);
+    //     ofstream file((test_folder + "test" + to_string(total_test_cases) + ".in").c_str());
+    //     file << a.size() << ' ' << b.size() << '\n';
+    //     for (auto &p: a) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file << '\n';
+    //     for (auto &p: b) {
+    //         file << p.first << ' ' << p.second << '\n';
+    //     }
+    //     file.close();
+    // }
+
     //update_tests(test_folder);
-    test_folder_answers(test_folder);
+    // test_folder_answers(test_folder);
 
     // for (int i = 0; i < 30; i++) {
     //     auto a = generate_string_for_not_compress_algorithms(5, 500, 5, 1000),
     //          b = generate_string_for_not_compress_algorithms(5, 500, 5, 1000);
     //     total_test_cases++;
     //
-    //     freopen((test_folder + "test" + to_string(total_test_cases) + ".in").c_str(), "w", stdout);
-    //     cout << a.size() << ' ' << b.size() << '\n';
-    //     for (auto &p: a) {
-    //         cout << p.first << ' ' << p.second << '\n';
-    //     }
-    //     cout << '\n';
-    //     for (auto &p: b) {
-    //         cout << p.first << ' ' << p.second << '\n';
-    //     }
-    //     fclose(stdout);
+
     // }
     // for (int i = 0; i < 30; i++) {
     //     auto a = generate_string_for_not_compress_algorithms(5, 5000, 10, 10000),

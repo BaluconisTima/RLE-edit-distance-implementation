@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <utility>
 #include <vector>
-#include "../structures/GeometricView.cpp"
-#include "../common/utils.cpp"
+#include "../../structures/GeometricView.cpp"
+#include "../../common/utils.cpp"
 using namespace std;
 
 GeometricView generate_point_test(int size_t, int block_limit) {

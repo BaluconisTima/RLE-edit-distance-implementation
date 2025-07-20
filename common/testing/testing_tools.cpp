@@ -39,8 +39,8 @@ void generate_hard_test(int n, int check_count, int blocks_per_add, int block_si
 }
 
 vector<pair<char, int> > compressed_string_generator(int block_number_limit, int block_size_limit, int char_limit_l, int char_limit_r) {
-    // int n = rand() % block_number_limit + 1;
-    int n = block_number_limit;
+    int n = rand() % block_number_limit + 1;
+    //int n = block_number_limit;
     vector<pair<char, int> > compressed_string;
     for (int i = 0; i < n; i++) {
         int rnd = rand() % (char_limit_r - char_limit_l + 1) + char_limit_l;
