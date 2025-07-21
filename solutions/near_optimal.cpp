@@ -35,47 +35,21 @@ node *calculateOutMismatch(node *left, node *top) {
         types_updated_counter = 0;
         auto left_h = SWM(left, h),
                 top_h = SWM(top, h);
-        // cerr << "lh th" << endl;
-        // print_tree(left_h);
-        // print_tree(top_h);
         node *left_2;
         auto split_l = smart_split(left_h, h - 1);
-        // cerr << "split_l" << endl;
-        // print_tree(split_l.first);
-        // print_tree(split_l.second);
-
-
         float lefthh = split_l.first->get_rightmost()->get_yr();
 
         auto intermission = new node(h - 1, w - 1, lefthh + h - 1, lefthh + w - 1);
-        // cerr << "intermission" << endl;
-        // print_tree(intermission);
 
         split_l.first->move_gradient_root(1);
-        // cerr << "split_l.first" << endl;
-        // print_tree(split_l.first);
         split_l.second->add_delta_root(w - h, w - 1);
-        // cerr << "split_l.second" << endl;
-        // print_tree(split_l.second);
         left_2 = smart_merge(split_l.first, intermission);
-        // cerr << "left_2" << endl;
-        // print_tree(left_2);
         left_2 = smart_merge(left_2, split_l.second);
-        // cerr << "left_2 after merge" << endl;
-        // print_tree(left_2);
 
         auto split_t = smart_split(top_h, w - 1);
-        // cerr << "split_t" << endl;
-        // print_tree(split_t.first);
         split_t.first->add_delta_root(0, h - 1);
-        // cerr << "split_t.first before grad" << endl;
-        // print_tree(split_t.second);
         split_t.second->move_gradient_root(-1);
-        // cerr << "split_t.second" << endl;
-        // print_tree(split_t.second);
         split_t.second->add_delta_root(0, -2 + w + h);
-        // cerr << "split_t.second after add_delta_root" << endl;
-        // print_tree(split_t.second);
 
         auto top_2 = smart_merge(split_t.first, split_t.second);
         return combine(top_2, left_2);
@@ -112,10 +86,6 @@ int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > 
             }
             out->pull();
             avg_segments_count += out->sz;
-            // cerr << out->sz << ' ' << types_updated_counter << endl;
-            // types_updated_counter = 0;
-            //cerr << "Segments count: " << out->sz << endl;
-            //print_tree(out);
             auto out_split = smart_split(out, b[j].second);
             out_split.second->add_delta_root(-out_split.second->get_leftmost()->get_xl(), 0);
 
@@ -123,12 +93,7 @@ int near_optimal_solution(vector<pair<char, int> > &a, vector<pair<char, int> > 
             ED_left[i%2][j + 1] = out_split.second;
         }
     }
-    // cerr << "Types updated: " << types_updated_counter << endl;
-    // cerr << "Average segments count: " << avg_segments_count << endl;
-    // cerr << "const: " << types_updated_counter / (avg_segments_count * log(avg_segments_count)) << endl;
-
     avg_segments_count = avg_segments_count / (b.size()) / (a.size());
-    cerr << "Average segments count: " << avg_segments_count << endl;
     return ED_top[a.size()%2][b.size() - 1]->get_rightmost()->get_yr();
 }
 
